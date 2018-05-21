@@ -7,10 +7,6 @@ tags:
   - python
 ---
 
-Its been a little while since my last post. Its been pretty chaotic with my job search lately and what not. Been shot a couple times but I wont let that get me down! Anyways...
-
-## Background
-
 I started a new project called [Bladedrone](https://github.com/kmcgamer/bladedrone), which is an Angular 6 application for players of the free to play, first person shooter called ["Ironsight"](). My goal for this project is to allow users to view statistics on weapons, compare/sort them, as well as create & share custom builds. I am super excited about it and have been working on it almost every day!
 
 ## The Problem

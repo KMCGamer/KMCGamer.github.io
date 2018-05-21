@@ -7,9 +7,15 @@ tags:
   - javascript
 ---
 
-You would think that the help command would be one of the easiest commands to implement, *right?*. I mean, it should ideally just print out the command's name followed by a helpful hint on how it works. However, my concern wasn't really about how the information was displayed, but more so about **how the information is navigated.**
+In this post, we design and implement a different approach to interacting with a help command. You would think that the help command would be one of the easiest commands to implement, *right?*. Lets talk about it.
+
+## The Problem
+
+The help command should ideally just print out the command's name followed by a helpful hint on how it works. Simple right? However, my concern wasn't really about how the information was displayed, but more so about **how the information is navigated.**
 
 Lets break it down for a second. You type `help`. What do you expect? A list, right? But what happens if there is more information than what could be ideally displayed at one time? You would probably have to type something like `help 1` or `help 2` and so on and so forth to access the different pages of the manual. Surely we can make this better.
+
+## The Solution
 
 I am proud to introduce the **_COMPLETELY ORIGINAL_** responsive help command!
 
@@ -17,11 +23,11 @@ I am proud to introduce the **_COMPLETELY ORIGINAL_** responsive help command!
 
 Let me first quickly explain how it works just in case you're lost. When the `help` command is entered, the bot sends back the first page of the manual, followed by a bunch of buttons that correspond to the other pages. By clicking on each number, you can see that page of the manual. Clicking the `X` results in the bot deleting the message. Neat.
 
-Lets try and go over how to make it. By the way, you can take a look at all of the code in my <a href="https://github.com/KMCGamer/usc_bot" target="_blank">github repository!</a> I will be going over the help command in `commands > help.js`. 
+## The Code
+
+Lets go over how to make it. By the way, you can take a look at all of the code in my [github repository!](https://github.com/KMCGamer/usc_bot) I will be going over the help command in `commands > help.js`. Click [here](https://github.com/KMCGamer/usc_bot/blob/master/commands/help.js) to be taken there.
 
 To preface all this, all of my commands have a `module.exports.run` that defines how the commands functions. Also, all the commands contain additional information that is exported such as the name, syntax, description, and more. Specifically, we will be taking a look at `module.exports.run`, which contains the meat of how this works. **Please note:** I am only going to over displaying all commands, so there will be bits of code that are skipped.
-
-## The Code
 
 I first start off by declaring an array that contains my buttons.
 
@@ -32,7 +38,7 @@ const buttons = [
 ];
 ```
 
-These buttons are imported from another module called <a href="https://github.com/KMCGamer/usc_bot/blob/master/modules/reactions.js" target="_blank">reactions.js</a> which ultimately handles emojis and defines how they're meant to be used. So really, this is just an array of emojis. I then go on to define the how many commands I want per page as well as declare the `pages` variable.
+These buttons are imported from another module called [reactions.js](https://github.com/KMCGamer/usc_bot/blob/master/modules/reactions.js) which ultimately handles emojis and defines how they're meant to be used. So really, this is just an array of emojis. I then go on to define the how many commands I want per page as well as declare the `pages` variable.
 
 ```javascript
 const commandsPerPage = 3;
@@ -45,7 +51,7 @@ The `pages` variable will ultimately contain the exact content that the bot will
 pages = _.chunk(client.commands, commandsPerPage);
 ```
 
-`client.commands` is an array that contains the `module.exports` for all commands. Using this, we are going to chunk that array using <a href="https://lodash.com/" target="_blank">lodash</a> based on the amount of commands we specified we wanted per page. In this case, we chose 3. The <a href="https://lodash.com/docs/4.17.4#chunk" target="_blank">chunk method</a> basically takes in an array and spits out an array of arrays of equal size (our size being 3).
+`client.commands` is an array that contains the `module.exports` for all commands. Using this, we are going to chunk that array using [lodash](https://lodash.com/) based on the amount of commands we specified we wanted per page. In this case, we chose 3. The [chunk method](https://lodash.com/docs/4.17.4#chunk) basically takes in an array and spits out an array of arrays of equal size (our size being 3).
 
 Now all we need to do is iterate over each chunk, or group, in `pages` and replace them with the information for all the commands in that chunk in a sendable message format for the bot.
 
@@ -70,7 +76,7 @@ pages = pages.map((page) => {
   };
 });
 ```
-The above code first creates a `fields` array that will contain the command names, descriptions, and syntax in that chunk. We then place those fields directly into another object that represents the entire embed message. We are using embeds because they look super nice compared to regular text messages. I used this <a href="https://leovoel.github.io/embed-visualizer/" target="_blank">embed visualizer</a> to make quick work of setting up the template above. 
+The above code first creates a `fields` array that will contain the command names, descriptions, and syntax in that chunk. We then place those fields directly into another object that represents the entire embed message. We are using embeds because they look super nice compared to regular text messages. I used this [embed visualizer](https://leovoel.github.io/embed-visualizer/) to make quick work of setting up the template above. 
 
 Alright, home stretch. We now need to configure how the bot will send the message and listen for the button presses.
 
@@ -121,15 +127,15 @@ message.channel.send(pages[0]).then(async (msg) => { // send the first command p
 
 First off, we send the first page of the manual `message.channel.send(pages[0])`. We then write `.then` to signify that after the prior code completes, we want to do more things. The `msg` variable is the message that was sent by the bot.
 
-We then display all of the necessary page number buttons by looping over `pages.entries()` in a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" target="_blank">for...of</a> loop. I would normally do this in a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in" target="_blank">for...in</a> loop but that caused asynchronous errors as the buttons would appear out of order. I also display the `X` button after the loop and set a timer for the message to delete after 60 seconds.
+We then display all of the necessary page number buttons by looping over `pages.entries()` in a [for...of](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of) loop. I would normally do this in a [for...in](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in) loop but that caused asynchronous errors as the buttons would appear out of order. I also display the `X` button after the loop and set a timer for the message to delete after 60 seconds.
 
-We then create a <a href="https://discord.js.org/#/docs/main/stable/class/ReactionCollector" target="_blank">ReactionCollector</a> on `msg` and apply a filter (function) onto it that says, "Hey bot, dont listen to your own reactions ya dummy". Had we not done this, the bot probably would have listened to its own button presses.
+We then create a [ReactionCollector](https://discord.js.org/#/docs/main/stable/class/ReactionCollector) on `msg` and apply a filter (function) onto it that says, "Hey bot, dont listen to your own reactions ya dummy". Had we not done this, the bot probably would have listened to its own button presses.
 
-Now we specify what we want to happen when the collector receives some button presses. First, I address what happens if the `X` button is pressed. If the `X` button is pressed, I want the message to be deleted, and I also want to destroy the <a href="https://discord.js.org/#/docs/main/stable/class/ReactionCollector" target="_blank">ReactionCollector</a>. If the X button wasn't the button that was pressed, we move on.
+Now we specify what we want to happen when the collector receives some button presses. First, I address what happens if the `X` button is pressed. If the `X` button is pressed, I want the message to be deleted, and I also want to destroy the ReactionCollector. If the X button wasn't the button that was pressed, we move on.
 
 I start off by getting the index of the page according to the button they pressed. Then, immediately after, I handle any errors that could arise if users react with an emoji to a page that doesn't exist, or react with an emoji that has nothing to do with the help command at all. So, if the `pageIndex` is `-1`, we just do nothing.
 
-Finally, in a *hacky* kind of way, we have to determine which reaction isn't the bots. This is because if you don't specify exactly which reaction you want to remove, it will remove the bots, which has unintended side effects. So we first access the <a href="https://discord.js.org/#/docs/main/stable/class/MessageReaction" target="_blank">messageReaction</a> which contains information about the emoji that was reacted. We access the `users` property to see all the people that reacted with that particular emoji. Ideally, the two people that should be in the `users` property is the bot, and the person interacting with the help command. We then filter out the bot by using <a href="https://discord.js.org/#/docs/main/stable/class/Collection?scrollTo=filter" target="_blank">filter()</a> and then call `first()` to access the user. Then call `await messageReaction.remove(notbot)` to remove the reaction, setting the emoji counter back down to 1.
+Finally, in a *hacky* kind of way, we have to determine which reaction isn't the bots. This is because if you don't specify exactly which reaction you want to remove, it will remove the bots, which has unintended side effects. So we first access the [messageReaction](https://discord.js.org/#/docs/main/stable/class/MessageReaction) which contains information about the emoji that was reacted. We access the `users` property to see all the people that reacted with that particular emoji. Ideally, the two people that should be in the `users` property is the bot, and the person interacting with the help command. We then filter out the bot by using [filter()](https://discord.js.org/#/docs/main/stable/class/Collection?scrollTo=filter) and then call `first()` to access the user. Then call `await messageReaction.remove(notbot)` to remove the reaction, setting the emoji counter back down to 1.
 
 **_TADA!_** All done!
 
